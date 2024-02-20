@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>SSE HTTP Pinger</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                font-family: sans-serif;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .hidden {
+                display: none;
+            }
+
+            form {
+                display: flex;
+                justify-content: center;
+                gap: 0.2rem;
+                margin: 2rem auto;
+            }
+
+            #address-input {
+                width: 20rem;
+            }
+
+            #result-box {
+                display: block;
+                margin: auto;
+                resize: none;
+            }
+        </style>
+    </head>
+    <body>
+        <form>
+            <input autofocus id="address-input" placeholder="Type your http(s) url here..." type="text" />
+            <button id="ping-button" onclick="startPing(event)" type="submit">Ping</button>
+            <button class="hidden" id="stop-button" onclick="stopPing(event)">Stop</button>
+        </form>
+        <textarea cols="70" id="result-box" rows="20"></textarea>
+
+        <script>
+            let addressInput = null;
+            let pingButton = null;
+            let resultBox = null;
+            let stopButton = null;
+
+            let sse = null;
+
+            document.addEventListener("DOMContentLoaded", () => {
+                addressInput = document.getElementById("address-input");
+                pingButton = document.getElementById("ping-button");
+                resultBox = document.getElementById("result-box");
+                stopButton = document.getElementById("stop-button");
+            });
+
+            function onSSEMessage(event) {
+                resultBox.value += `${event.data}\n`;
+                resultBox.scrollTop = resultBox.scrollHeight;
+            }
+
+            function startPing(event) {
+                event.preventDefault();
+                pingButton.classList.add("hidden");
+                stopButton.classList.remove("hidden");
+                resultBox.value = "";
+
+                const url = encodeURI(addressInput.value);
+                sse = new EventSource(`http://localhost:3000/ping?url=${url}`);
+                sse.onmessage = onSSEMessage;
+                sse.onerror = stopPing;
+            }
+
+            function stopPing(event) {
+                event.preventDefault();
+                stopButton.classList.add("hidden");
+                pingButton.classList.remove("hidden");
+
+                if (sse) {
+                    sse.close();
+                    sse = null;
+                }
+            }
+        </script>
+    </body>
+</html>
