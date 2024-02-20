@@ -19,7 +19,7 @@ The server sends a HEAD request to the target URL every 2 seconds then the serve
 ### Cons
 
 -   No binary support, only UTF-8
--   Maximum open connections limit, six concurrent connections per browser.
+-   Maximum open connections limit, six concurrent connections per browser
 
 ## Run It
 
@@ -27,6 +27,6 @@ The server sends a HEAD request to the target URL every 2 seconds then the serve
 go run main.go
 ```
 
-Open `http://localhost:3000` in your browser.
+Then, access `http://localhost:3000` in your browser.
 
 ![Demo](/demo.png)
